@@ -27,6 +27,8 @@ Colección de proyectos que desarrollé mientras aprendía distintos lenguajes y
 | PHP | `php -S localhost:8000` dentro de la carpeta | Cualquier hosting con PHP |
 | Web (HTML/JS) | Abrir `index.html` | GitHub Pages |
 
-## 👤 Autor
+## Autor
 
-**Dominic De Freitas** — [GitHub](https://github.com/dominic0285) · [LinkedIn](https://www.linkedin.com/in/dominic-de-freitas-07102828a/)
+**Dominic De Freitas** — Ingeniero en Informática (UGMA). Desarrollo aplicaciones móviles y web con React Native, TypeScript, Node.js y Python, y busco mi primer puesto como desarrollador junior remoto.
+
+[Perfil de GitHub](https://github.com/dominic0285) · [LinkedIn](https://www.linkedin.com/in/dominic-de-freitas-07102828a/) · dominicdefreitasfd@gmail.com
