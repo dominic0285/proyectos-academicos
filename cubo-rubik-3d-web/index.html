@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cubo de Rubik</title>
+    <style>
+        /* Estilos básicos de la página */
+        body {
+            margin: 0; /* Elimina los márgenes para aprovechar toda la pantalla */
+            overflow: hidden; /* Oculta cualquier contenido que exceda los límites */
+            background-color: black; /* Fondo negro para un mejor contraste */
+            display: flex; /* Usamos Flexbox para centrar el contenido */
+            flex-direction: column; /* Alineamos elementos en columna */
+            align-items: center; /* Centramos los elementos horizontalmente */
+        }
+        #container {
+            width: 100%; /* Ancho completo de la ventana */
+            height: 80vh; /* Altura del contenedor (80% de la ventana) */
+        }
+        #controls {
+            /* Estilos para la sección de controles */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px; /* Separación superior */
+        }
+        .row-buttons, .column-buttons, .action-buttons {
+            /* Estilos compartidos para los diferentes grupos de botones */
+            display: flex;
+            gap: 10px; /* Espacio entre botones */
+            margin-bottom: 10px; /* Margen inferior entre grupos */
+        }
+        button {
+            /* Estilos básicos de los botones */
+            padding: 10px; /* Espaciado interno */
+            font-size: 14px; /* Tamaño de texto */
+            background-color: #000; /* Fondo negro */
+            color: #fff; /* Texto blanco */
+            border: 1px solid #444; /* Borde gris oscuro */
+            border-radius: 5px; /* Bordes redondeados */
+            cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+        }
+        button:hover {
+            /* Efecto visual al pasar sobre un botón */
+            background-color: #444; /* Cambia el fondo a gris más claro */
+        }
+    </style>
+</head>
+<body>
+    <!-- Controles para interactuar con el cubo -->
+    <div id="controls">
+        <!-- Botones para rotar las filas -->
+        <div class="row-buttons">
+            <button onclick="rotateLayer('y', 2)">Fila Superior</button>
+            <button onclick="rotateLayer('y', 1)">Fila Central</button>
+            <button onclick="rotateLayer('y', 0)">Fila Inferior</button>
+        </div>
+        <!-- Botones para rotar las columnas -->
+        <div class="column-buttons">
+            <button onclick="rotateLayer('x', 2)">Columna Izquierda</button>
+            <button onclick="rotateLayer('x', 1)">Columna Central</button>
+            <button onclick="rotateLayer('x', 0)">Columna Derecha</button>
+        </div>
+        <!-- Botones para otras acciones -->
+        <div class="action-buttons">
+            <button onclick="resetCube()">Resolver Cubo</button>
+            <button onclick="checkCube()">Verificar Estado</button>
+        </div>
+    </div>
+    <div id="container"></div> <!-- Contenedor para el renderizado 3D -->
+
+    <!-- Biblioteca Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <!-- Controles de órbita para navegar la escena -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        // Configuración inicial del contenedor 3D
+        const container = document.getElementById('container');
+        const scene = new THREE.Scene(); // Creamos la escena principal
+        const camera = new THREE.PerspectiveCamera(
+            75, 
+            window.innerWidth / window.innerHeight, 
+            0.1, 
+            1000
+        ); // Configuramos la cámara para una vista en perspectiva
+        const renderer = new THREE.WebGLRenderer(); // Motor de renderizado WebGL
+
+        // Establecemos el tamaño del renderizador basado en el tamaño de la ventana
+        renderer.setSize(window.innerWidth, window.innerHeight * 0.8);
+        container.appendChild(renderer.domElement); // Agregamos el renderizador al DOM
+
+        // Configuración de los controles de órbita
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; // Suavizado en el movimiento de cámara
+        controls.dampingFactor = 0.05; // Intensidad del suavizado
+
+        // Posicionamos la cámara para tener una vista inicial adecuada
+        camera.position.set(6, 6, 6);
+        controls.update(); // Actualizamos los controles con la posición inicial
+
+        // Tamaño y espaciado de los subcubos
+        const cubeSize = 1;
+        const spacing = 0.1;
+        const cubes = []; // Arreglo para almacenar los subcubos
+
+        // Colores iniciales para cada cara del cubo
+        const initialColors = {
+            front: 0xff0000,  // Rojo
+            back: 0x0000ff,   // Azul
+            left: 0x00ff00,   // Verde
+            right: 0xffff00,  // Amarillo
+            top: 0xffffff,    // Blanco
+            bottom: 0xffa500  // Naranja
+        };
+
+        // Array para guardar las posiciones y rotaciones iniciales de cada subcubo
+        const initialStates = [];
+
+        // Creación de los 27 subcubos del cubo de Rubik
+        for (let x = 0; x < 3; x++) {
+            for (let y = 0; y < 3; y++) {
+                for (let z = 0; z < 3; z++) {
+                    // Geometría del cubo
+                    const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+
+                    // Materiales para las caras del cubo
+                    const materials = [
+                        new THREE.MeshBasicMaterial({ color: initialColors.front }), // Frente
+                        new THREE.MeshBasicMaterial({ color: initialColors.back }),  // Atrás
+                        new THREE.MeshBasicMaterial({ color: initialColors.left }),  // Izquierda
+                        new THREE.MeshBasicMaterial({ color: initialColors.right }), // Derecha
+                        new THREE.MeshBasicMaterial({ color: initialColors.top }),   // Arriba
+                        new THREE.MeshBasicMaterial({ color: initialColors.bottom }) // Abajo
+                    ];
+
+                    // Creación del subcubo con su geometría y materiales
+                    const cube = new THREE.Mesh(geometry, materials);
+
+                    // Posicionamos el subcubo basado en su índice en la cuadrícula
+                    const position = {
+                        x: x * (cubeSize + spacing) - (cubeSize + spacing),
+                        y: y * (cubeSize + spacing) - (cubeSize + spacing),
+                        z: z * (cubeSize + spacing) - (cubeSize + spacing)
+                    };
+                    cube.position.set(position.x, position.y, position.z);
+
+                    // Guardamos su estado inicial para referencias futuras
+                    initialStates.push({
+                        position: { ...position }, // Copiamos la posición inicial
+                        rotation: { x: 0, y: 0, z: 0 } // Sin rotación inicial
+                    });
+
+                    // Agregamos el subcubo a la lista y a la escena
+                    cubes.push(cube);
+                    scene.add(cube);
+                }
+            }
+        }
+
+        // Función para rotar filas o columnas
+        function rotateLayer(axis, index) {
+            const rotationMatrix = new THREE.Matrix4(); // Matriz de rotación
+            const affectedCubes = []; // Cubos afectados por la rotación
+
+            // Identificamos los subcubos que pertenecen a la fila o columna seleccionada
+            if (axis === 'y') {
+                rotationMatrix.makeRotationY(Math.PI / 2); // Rotación en el eje Y
+                cubes.forEach(cube => {
+                    if (Math.abs(cube.position.y - (index * (cubeSize + spacing) - (cubeSize + spacing))) < 0.01) {
+                        affectedCubes.push(cube); // Agregamos cubo afectado
+                    }
+                });
+            } else if (axis === 'x') {
+                rotationMatrix.makeRotationX(Math.PI / 2); // Rotación en el eje X
+                cubes.forEach(cube => {
+                    if (Math.abs(cube.position.x - (index * (cubeSize + spacing) - (cubeSize + spacing))) < 0.01) {
+                        affectedCubes.push(cube);
+                    }
+                });
+            }
+
+            // Aplicamos la rotación a los cubos afectados
+            affectedCubes.forEach(cube => {
+                cube.position.applyMatrix4(rotationMatrix); // Aplicamos transformación de posición
+                cube.rotation.x += axis === 'x' ? Math.PI / 2 : 0; // Ajustamos rotación X
+                cube.rotation.y += axis === 'y' ? Math.PI / 2 : 0; // Ajustamos rotación Y
+            });
+
+            renderer.render(scene, camera); // Renderizamos la escena para reflejar cambios
+        }
+
+        // Restablece el cubo a su estado inicial
+        function resetCube() {
+            cubes.forEach((cube, index) => {
+                const initialState = initialStates[index];
+
+                // Restauramos la posición inicial
+                cube.position.set(
+                    initialState.position.x,
+                    initialState.position.y,
+                    initialState.position.z
+                );
+
+                // Restauramos la rotación inicial
+                cube.rotation.set(
+                    initialState.rotation.x,
+                    initialState.rotation.y,
+                    initialState.rotation.z
+                );
+            });
+
+            renderer.render(scene, camera); // Renderizamos la escena actualizada
+        }
+
+        // Verifica si el cubo está resuelto
+        function checkCube() {
+            let solved = true; // Suponemos que está resuelto
+
+            cubes.forEach((cube, index) => {
+                const initialState = initialStates[index];
+
+                // Comprobamos si las posiciones coinciden
+                const posMatch = (
+                    Math.abs(cube.position.x - initialState.position.x) < 0.01 &&
+                    Math.abs(cube.position.y - initialState.position.y) < 0.01 &&
+                    Math.abs(cube.position.z - initialState.position.z) < 0.01
+                );
+
+                // Comprobamos si las rotaciones coinciden
+                const rotMatch = (
+                    Math.abs(cube.rotation.x % (Math.PI * 2)) < 0.01 &&
+                    Math.abs(cube.rotation.y % (Math.PI * 2)) < 0.01 &&
+                    Math.abs(cube.rotation.z % (Math.PI * 2)) < 0.01
+                );
+
+                if (!posMatch || !rotMatch) {
+                    solved = false; // Si alguna no coincide, el cubo no está resuelto
+                }
+            });
+
+            // Mostramos un mensaje basado en el resultado
+            if (solved) {
+                alert('¡El cubo está resuelto!');
+            } else {
+                alert('El cubo no está resuelto. Sigue girando las caras.');
+            }
+        }
+
+        // Función de animación para actualizar continuamente la escena
+        function animateScene() {
+            requestAnimationFrame(animateScene); // Llamada recursiva para animación continua
+            controls.update(); // Actualizamos los controles de cámara
+            renderer.render(scene, camera); // Renderizamos la escena
+        }
+
+        // Iniciamos la animación
+        animateScene();
+    </script>
+</body>
+</html>

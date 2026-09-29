@@ -1,0 +1,6 @@
+c++ por la practica
+codigo del libro:1234 
+------------------
+calculo diferencial
+codigo del libro:5678 
+------------------

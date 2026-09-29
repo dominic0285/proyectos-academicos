@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos en Canvas</title>
+    <style>
+        body {
+            display: flex; // Usamos flexbox para alinear los gráficos
+            justify-content: space-around; // Espacio entre los gráficos
+            align-items: center; // Centrar verticalmente
+            height: 100vh; // Altura completa de la ventana
+            margin: 0; // Sin márgenes
+            background-color: #f0f0f0; // Color de fondo suave
+        }
+        canvas {
+            border: 1px solid #000; // Borde negro para los gráficos
+            background-color: #fff; // Fondo blanco para el canvas
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas1" width="400" height="400"></canvas> <!-- Canvas para el triángulo -->
+    <canvas id="canvas2" width="400" height="400"></canvas> <!-- Canvas para la "S" -->
+    <canvas id="canvas3" width="400" height="400"></canvas> <!-- Canvas para la "U" -->
+
+    <script>
+        const azulIntenso = '#0000FF'; // Definir color azul intenso
+        const grisSuave = '#A9A9A9'; // Color gris suave para los números de las escalas
+
+        // Función para dibujar el primer gráfico: Triángulo
+        function drawGraph1() {
+            const canvas = document.getElementById('canvas1'); // Obtener el canvas del triángulo
+            const ctx = canvas.getContext('2d'); // Obtener el contexto 2D del canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
+
+            // Dibujar los ejes
+            ctx.beginPath(); // Comenzar un nuevo camino
+            ctx.moveTo(200, 0); // Mover al inicio del eje Y
+            ctx.lineTo(200, 400); // Dibujar el eje Y
+            ctx.moveTo(0, 200); // Mover al inicio del eje X
+            ctx.lineTo(400, 200); // Dibujar el eje X
+            ctx.strokeStyle = 'black'; // Establecer color negro para los ejes
+            ctx.stroke(); // Dibujar los ejes
+
+            // Números de los ejes
+            ctx.fillStyle = azulIntenso; // Color azul intenso
+            ctx.font = '10px Arial'; // Establecer fuente y tamaño
+            ctx.fillText("I", 220, 20);   // Cuadrante I
+            ctx.fillText("II", 20, 20);    // Cuadrante II
+            ctx.fillText("III", 20, 380);  // Cuadrante III
+            ctx.fillText("IV", 220, 380);  // Cuadrante IV
+
+            // Marcas y números en el eje X
+            ctx.fillStyle = grisSuave; // Cambiar color a gris suave para los números
+            for (let i = -10; i <= 10; i++) { // Iterar de -10 a 10
+                if (i !== 0) { // Evitar el cero
+                    ctx.fillText(i, 200 + i * 20, 215); // Dibujar el número en el eje X
+                    ctx.beginPath(); // Comenzar un nuevo camino
+                    ctx.moveTo(200 + i * 20, 200 - 5); // Marca en el eje X
+                    ctx.lineTo(200 + i * 20, 200 + 5); // Marca en el eje X
+                    ctx.stroke(); // Dibujar la marca
+                }
+            }
+
+            // Marcas y números en el eje Y
+            for (let i = -10; i <= 10; i++) { // Iterar de -10 a 10
+                if (i !== 0) { // Evitar el cero
+                    ctx.fillText(i, 185, 200 - i * 20); // Dibujar el número en el eje Y
+                    ctx.beginPath(); // Comenzar un nuevo camino
+                    ctx.moveTo(200 - 5, 200 - i * 20); // Marca en el eje Y
+                    ctx.lineTo(200 + 5, 200 - i * 20); // Marca en el eje Y
+                    ctx.stroke(); // Dibujar la marca
+                }
+            }
+
+            // Triángulo vacío (solo líneas) con ajuste en la posición
+            ctx.strokeStyle = azulIntenso; // Color azul intenso para el triángulo
+            ctx.beginPath(); // Comenzar un nuevo camino
+            ctx.moveTo(200 + -6 * 20, 200 + 0 * 20 + 30);  // Vértice inferior izquierdo del triángulo
+            ctx.lineTo(200 + 5 * 20, 200 - 3 * 20 + 30);   // Vértice inferior derecho del triángulo
+            ctx.lineTo(200 + 5 * 20, 200 + 4 * 20 + 30);   // Vértice superior del triángulo
+            ctx.closePath(); // Cerrar el camino del triángulo
+            ctx.stroke(); // Solo dibujar el contorno
+            ctx.fillText("Triángulo", 160, 20);  // Título
+        }
+
+        // Función para dibujar el segundo gráfico: Recta con dos curvas (S)
+        function drawGraph2() {
+            const canvas = document.getElementById('canvas2'); // Obtener el canvas de la "S"
+            const ctx = canvas.getContext('2d'); // Obtener el contexto 2D del canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
+
+            // Dibujar los ejes
+            ctx.beginPath(); // Comenzar un nuevo camino
+            ctx.moveTo(200, 0); // Mover al inicio del eje Y
+            ctx.lineTo(200, 400); // Dibujar el eje Y
+            ctx.moveTo(0, 200); // Mover al inicio del eje X
+            ctx.lineTo(400, 200); // Dibujar el eje X
+            ctx.strokeStyle = 'black'; // Establecer color negro para los ejes
+            ctx.stroke(); // Dibujar los ejes
+
+            // Números de los ejes
+            ctx.fillStyle = azulIntenso; // Color azul intenso
+            ctx.font = '10px Arial'; // Establecer fuente y tamaño
+            ctx.fillText("I", 220, 20);   // Cuadrante I
+            ctx.fillText("II", 20, 20);    // Cuadrante II
+            ctx.fillText("III", 20, 380);  // Cuadrante III
+            ctx.fillText("IV", 220, 380);  // Cuadrante IV
+
+            // Marcas y números en el eje X
+            ctx.fillStyle = grisSuave; // Cambiar color a gris suave para los números
+            for (let i = -10; i <= 10; i++) { // Iterar de -10 a 10
+                if (i !== 0) { // Evitar el cero
+                    ctx.fillText(i, 200 + i * 20, 215); // Dibujar el número en el eje X
+                    ctx.beginPath(); // Comenzar un nuevo camino
+                    ctx.moveTo(200 + i * 20, 200 - 5); // Marca en el eje X
+                    ctx.lineTo(200 + i * 20, 200 + 5); // Marca en el eje X
+                    ctx.stroke(); // Dibujar la marca
+                }
+            }
+
+            // Marcas y números en el eje Y
+            for (let i = -10; i <= 10; i++) { // Iterar de -10 a 10
+                if (i !== 0) { // Evitar el cero
+                    ctx.fillText(i, 185, 200 - i * 20); // Dibujar el número en el eje Y
+                    ctx.beginPath(); // Comenzar un nuevo camino
+                    ctx.moveTo(200 - 5, 200 - i * 20); // Marca en el eje Y
+                    ctx.lineTo(200 + 5, 200 - i * 20); // Marca en el eje Y
+                    ctx.stroke(); // Dibujar la marca
+                }
+            }
+
+            // Gráfico de la curva, aumentando la escala
+            const scale = 70;  // Aumenté el factor de escala para hacer la curva más grande
+            ctx.beginPath(); // Comenzar un nuevo camino
+            for (let t = -Math.PI; t <= Math.PI; t += 0.05) { // Iterar de -π a π
+                const x = t; // Definir x
+                const y = Math.sin(t); // Calcular y como seno de x
+                const theta = 60 * (Math.PI / 180); // Convertir a radianes
+                const x_rot = x * Math.cos(theta) - y * Math.sin(theta); // Rotar en X
+                const y_rot = x * Math.sin(theta) + y * Math.cos(theta); // Rotar en Y
+                ctx.lineTo(200 + x_rot * scale, 200 - y_rot * scale); // Añadir punto al camino
+            }
+            ctx.strokeStyle = azulIntenso; // Color azul intenso para la línea
+            ctx.stroke(); // Dibujar la curva
+            ctx.fillText("S", 180, 20);  // Título
+        }
+
+        // Función para dibujar el tercer gráfico: Plano (bajante)
+        function drawGraph3() {
+            const canvas = document.getElementById('canvas3'); // Obtener el canvas de la "U"
+            const ctx = canvas.getContext('2d'); // Obtener el contexto 2D del canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
+
+            // Dibujar los ejes
+            ctx.beginPath(); // Comenzar un nuevo camino
+            ctx.moveTo(200, 0); // Mover al inicio del eje Y
+            ctx.lineTo(200, 400); // Dibujar el eje Y
+            ctx.moveTo(0, 200); // Mover al inicio del eje X
+            ctx.lineTo(400, 200); // Dibujar el eje X
+            ctx.strokeStyle = 'black'; // Establecer color negro para los ejes
+            ctx.stroke(); // Dibujar los ejes
+
+            // Números de los ejes
+            ctx.fillStyle = azulIntenso; // Color azul intenso
+            ctx.font = '10px Arial'; // Establecer fuente y tamaño
+            ctx.fillText("I", 220, 20);   // Cuadrante I
+            ctx.fillText("II", 20, 20);    // Cuadrante II
+            ctx.fillText("III", 20, 380);  // Cuadrante III
+            ctx.fillText("IV", 220, 380);  // Cuadrante IV
+
+            // Marcas y números en el eje X
+            ctx.fillStyle = grisSuave; // Cambiar color a gris suave para los números
+            for (let i = -10; i <= 10; i++) { // Iterar de -10 a 10
+                if (i !== 0) { // Evitar el cero
+                    ctx.fillText(i, 200 + i * 20, 215); // Dibujar el número en el eje X
+                    ctx.beginPath(); // Comenzar un nuevo camino
+                    ctx.moveTo(200 + i * 20, 200 - 5); // Marca en el eje X
+                    ctx.lineTo(200 + i * 20, 200 + 5); // Marca en el eje X
+                    ctx.stroke(); // Dibujar la marca
+                }
+            }
+
+            // Marcas y números en el eje Y
+            for (let i = -10; i <= 10; i++) { // Iterar de -10 a 10
+                if (i !== 0) { // Evitar el cero
+                    ctx.fillText(i, 185, 200 - i * 20); // Dibujar el número en el eje Y
+                    ctx.beginPath(); // Comenzar un nuevo camino
+                    ctx.moveTo(200 - 5, 200 - i * 20); // Marca en el eje Y
+                    ctx.lineTo(200 + 5, 200 - i * 20); // Marca en el eje Y
+                    ctx.stroke(); // Dibujar la marca
+                }
+            }
+
+            // Gráfico bajante
+            ctx.beginPath(); // Comenzar un nuevo camino
+            for (let x = -10; x <= 10; x += 0.05) { // Iterar de -10 a 10
+                let y = (x / 2) ** 2 - 8; // Calcular y para la parábola
+                ctx.lineTo(200 + x * 20, 200 - y * 10);  // Cambié la escala de y
+            }
+            ctx.strokeStyle = azulIntenso;  // Color azul intenso para la línea
+            ctx.stroke(); // Dibujar la línea de la parábola
+            ctx.fillText("Bajante", 160, 20);  // Título
+        }
+
+        // Dibujar los gráficos en el nuevo orden
+        drawGraph1(); // Llamar a la función para dibujar el triángulo
+        drawGraph2(); // Llamar a la función para dibujar la "S"
+        drawGraph3(); // Llamar a la función para dibujar la "U"
+    </script>
+</body>
+</html>

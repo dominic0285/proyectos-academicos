@@ -1,0 +1,4 @@
+*.exe
+*.o
+archivo de salida de libros.txt
+libros/*.pdf
